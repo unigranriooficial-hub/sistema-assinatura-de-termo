@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Autorização de uso de imagem e voz | Afya Unigranrio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#2B1633; --muted:#6E5E75; --brand:#C41E52; --brand-dark:#A3173F; --brand-soft:#FBE7EE;
+    --bg:#F4EFF5; --sheet:#FFFFFF; --line:#E4DBE6; --danger:#B3261E; --ok:#1F7A5C;
+    --display:"Bricolage Grotesque", system-ui, sans-serif;
+    --body:"Figtree", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --paper:Georgia, "Times New Roman", serif;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-padding-top:90px; }
+  body { margin:0; font-family:var(--body); font-size:16px; color:var(--ink); background:var(--bg); line-height:1.55; -webkit-font-smoothing:antialiased; }
+
+  /* Topo fixo com progresso */
+  .topbar { position:sticky; top:0; z-index:20; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  .topbar-in { max-width:960px; margin:0 auto; padding:10px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  #logoBox img { max-height:36px; display:block; }
+  #logoBox .wordmark { font-family:var(--display); font-weight:800; font-size:26px; color:var(--brand); font-style:italic; line-height:1; }
+  #progTxt { font-size:13.5px; color:var(--muted); white-space:nowrap; }
+  #progTxt.done { color:var(--ok); font-weight:600; }
+  .bar { height:4px; background:var(--line); }
+  .bar i { display:block; height:100%; width:0; background:var(--brand); transition:width .35s ease; }
+
+  /* Abertura */
+  .hero { max-width:960px; margin:0 auto; padding:40px 20px 24px; }
+  .hero h1 { font-family:var(--display); font-weight:800; font-size:clamp(30px,5.2vw,48px); line-height:1.08; letter-spacing:-.02em; margin:0 0 12px; max-width:16em; }
+  .hero p { margin:0; font-size:18px; color:var(--muted); max-width:34em; }
+
+  /* Folha do formulário */
+  .sheet { max-width:960px; margin:0 auto 48px; background:var(--sheet); border-radius:20px; padding:8px 28px 32px; box-shadow:0 10px 40px rgba(60,20,70,.08); }
+  @media (max-width:640px){ .sheet { border-radius:0; padding:4px 18px 28px; } }
+
+  .sec { display:grid; grid-template-columns:1fr; gap:14px; padding:30px 0; border-top:1px solid var(--line); }
+  .sec:first-of-type { border-top:0; }
+  @media (min-width:860px){ .sec { grid-template-columns:240px 1fr; gap:36px; } }
+  .sec-head .num { font-family:var(--display); font-weight:800; font-size:40px; line-height:1; color:var(--brand); display:block; margin-bottom:6px; }
+  .sec-head h2 { font-family:var(--display); font-weight:600; font-size:21px; line-height:1.2; margin:0 0 6px; }
+  .sec-head p { margin:0; font-size:14.5px; color:var(--muted); }
+
+  /* Campos */
+  .grid { display:grid; grid-template-columns:repeat(6,1fr); gap:16px 14px; }
+  .grid > div { grid-column:span 6; }
+  @media (min-width:640px){ .s2{grid-column:span 2!important} .s3{grid-column:span 3!important} .s4{grid-column:span 4!important} }
+  label { display:block; font-size:14px; font-weight:600; margin-bottom:6px; }
+  label .opt { font-weight:400; color:var(--muted); }
+  input[type=text], input[type=date], select { width:100%; height:48px; padding:0 14px; border:1.5px solid #D2C6D6; border-radius:10px; font:inherit; font-size:16px; color:var(--ink); background:#fff; transition:border-color .15s, box-shadow .15s; }
+  input::placeholder { color:#A596AB; }
+  input:focus-visible, select:focus-visible { outline:none; border-color:var(--brand); box-shadow:0 0 0 4px rgba(196,30,82,.16); }
+  .invalid { border-color:var(--danger)!important; }
+  .err { color:var(--danger); font-size:13px; min-height:18px; margin-top:4px; }
+  .hint { font-size:13.5px; color:var(--muted); }
+  input[type=checkbox], input[type=radio] { width:22px; height:22px; accent-color:var(--brand); flex:none; margin:0; }
+  .check { display:flex; gap:12px; align-items:flex-start; font-weight:400; font-size:15px; margin:14px 0 0; cursor:pointer; line-height:1.45; }
+  .check input { margin-top:1px; }
+  .radios { display:flex; flex-direction:column; gap:10px; padding-top:2px; }
+  .radios label { display:flex; gap:10px; align-items:center; font-weight:400; font-size:15px; margin:0; cursor:pointer; }
+  #menor-box { display:none; margin-top:18px; padding-top:18px; border-top:1px dashed #D2C6D6; }
+  #cepMsg { margin-top:8px; min-height:18px; }
+
+  /* Termo como papel */
+  .term { max-height:300px; overflow:auto; padding:18px 20px; border:1px solid var(--line); border-radius:4px; background:#fff; box-shadow:inset 0 -14px 14px -14px rgba(43,22,51,.18); }
+  .term p { font-family:var(--paper); font-size:15px; line-height:1.7; text-align:justify; margin:0 0 12px; hyphens:auto; }
+  .term.plain { background:#FAF7FB; }
+  .term.plain ul { margin:0; padding-left:20px; font-size:14.5px; line-height:1.6; }
+  .term.plain li { margin-bottom:8px; }
+
+  /* Assinatura */
+  .sigwrap { position:relative; border:1.5px solid #D2C6D6; border-radius:6px; background:#fff; }
+  .sigwrap.invalid { border-color:var(--danger); }
+  .sigwrap::before { content:""; position:absolute; left:20px; right:20px; top:72%; border-top:2px solid rgba(196,30,82,.35); pointer-events:none; }
+  .sigwrap::after { content:"x"; position:absolute; left:20px; top:calc(72% - 26px); font-family:var(--display); font-weight:600; font-size:22px; color:rgba(196,30,82,.55); pointer-events:none; }
+  .sigwrap .ph { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#B3A5B8; font-size:15px; pointer-events:none; padding-bottom:40px; transition:opacity .2s; }
+  .sigwrap.has-sig .ph { opacity:0; }
+  canvas#sig { display:block; width:100%; height:210px; touch-action:none; cursor:crosshair; }
+  .sig-actions { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:10px; }
+
+  /* Botões */
+  button { font:inherit; cursor:pointer; border-radius:10px; padding:10px 18px; border:1.5px solid #D2C6D6; background:#fff; color:var(--ink); min-height:44px; }
+  button:hover { background:#FAF7FB; }
+  button:focus-visible { outline:none; box-shadow:0 0 0 4px rgba(196,30,82,.2); }
+  button.primary { background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; font-size:17px; min-height:56px; padding:0 32px; width:100%; }
+  button.primary:hover { background:var(--brand-dark); border-color:var(--brand-dark); }
+  button:disabled { opacity:.65; cursor:wait; }
+  @media (min-width:860px){ button.primary { width:auto; min-width:300px; } }
+  #status { margin-top:12px; font-size:14.5px; color:var(--danger); min-height:20px; }
+  .foot-note { margin-top:6px; }
+
+  /* Tela de sucesso */
+  #ok { display:none; position:fixed; inset:0; background:rgba(244,239,245,.98); z-index:50; align-items:center; justify-content:center; text-align:center; padding:24px; }
+  #ok.show { display:flex; }
+  #ok .box { max-width:440px; background:#fff; border-radius:20px; padding:36px 28px; box-shadow:0 10px 40px rgba(60,20,70,.12); animation:pop .3s ease; }
+  @keyframes pop { from { transform:scale(.96); opacity:0; } to { transform:none; opacity:1; } }
+  #ok svg { width:64px; height:64px; margin-bottom:8px; }
+  #ok h2 { font-family:var(--display); font-weight:800; font-size:28px; margin:0 0 8px; }
+  #ok p { margin:0 0 14px; color:var(--muted); }
+  #ok .prot { font-family:ui-monospace, Menlo, Consolas, monospace; font-size:15px; background:var(--brand-soft); color:var(--brand-dark); padding:8px 12px; border-radius:8px; display:inline-block; margin:6px 0 20px; }
+  #ok button { background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; min-height:50px; padding:0 26px; }
+
+  @media (prefers-reduced-motion:reduce){ *, *::before, *::after { animation:none!important; transition:none!important; } }
+
+  /* Documento oculto usado para gerar o PDF */
+  #pdf-root { position:fixed; left:-10000px; top:0; width:794px; background:#fff; color:#000; padding:56px 64px; font-family:"Times New Roman",Times,serif; font-size:14px; line-height:1.55; }
+  #pdf-root h2 { text-align:center; text-decoration:underline; font-size:18px; margin:18px 0 26px; }
+  #pdf-root p { text-align:justify; margin:0 0 12px; }
+  #pdf-root .logo { text-align:center; }
+  #pdf-root .logo img { max-height:60px; }
+  #pdf-root .logo .wordmark { font-size:36px; font-weight:700; color:#d6285a; font-style:italic; font-family:Arial,sans-serif; }
+  #pdf-root .sig { margin-top:30px; }
+  #pdf-root .sig img { height:70px; display:block; }
+  #pdf-root .sig .line { border-top:1px solid #000; width:320px; padding-top:4px; }
+  #pdf-root .meta { margin-top:22px; font-size:11px; color:#333; border-top:1px solid #999; padding-top:8px; font-family:Arial,sans-serif; line-height:1.45; }
+  #pdf-root .meta .hash { word-break:break-all; font-family:monospace; font-size:10px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div id="logoBox"><div class="wordmark">Afya</div></div>
+    <span id="progTxt">0% preenchido</span>
+  </div>
+  <div class="bar"><i id="barFill"></i></div>
+</div>
+
+<div class="hero">
+  <h1>Autorização de uso de imagem e voz</h1>
+  <p>Preencha seus dados, assine na tela e baixe o PDF. Leva cerca de dois minutos.</p>
+</div>
+
+<main>
+<form id="form" class="sheet" novalidate>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">1</span><h2>Onde você está</h2><p>Assim organizamos os termos por unidade e evento.</p></div>
+    <div class="sec-body"><div class="grid">
+      <div class="s3"><label for="unidade">Unidade</label>
+        <select id="unidade">
+          <option value="">Selecione</option>
+          <option>Duque de Caxias</option>
+          <option>Nova Iguaçu</option>
+          <option>Outra</option>
+        </select><div class="err" data-for="unidade"></div></div>
+      <div class="s3"><label for="evento">Evento ou campanha <span class="opt">(opcional)</span></label>
+        <input type="text" id="evento" placeholder="Ex.: Vestibular 2027"></div>
+    </div></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">2</span><h2>Seus dados</h2><p>Preencha como aparecem no seu documento.</p></div>
+    <div class="sec-body"><div class="grid">
+      <div><label for="nome">Nome completo</label><input type="text" id="nome" autocomplete="name"><div class="err" data-for="nome"></div></div>
+      <div class="s3"><label for="rg">Identidade (RG)</label><input type="text" id="rg"><div class="err" data-for="rg"></div></div>
+      <div class="s3"><label for="cpf">CPF</label><input type="text" id="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><div class="err" data-for="cpf"></div></div>
+      <div class="s2"><label for="cep">CEP</label><input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"><div class="err" data-for="cep"></div></div>
+      <div class="s4"><label for="endereco">Endereço</label><input type="text" id="endereco" autocomplete="street-address"><div class="err" data-for="endereco"></div></div>
+      <div class="s2"><label for="numero">Número</label><input type="text" id="numero"><div class="err" data-for="numero"></div></div>
+      <div class="s2"><label for="cidade">Cidade</label><input type="text" id="cidade"><div class="err" data-for="cidade"></div></div>
+      <div class="s2"><label for="uf">UF</label><select id="uf"><option value="">Selecione</option></select><div class="err" data-for="uf"></div></div>
+    </div>
+    <div class="hint" id="cepMsg"></div></div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">3</span><h2>Menor de idade</h2><p>Só preencha se for autorizar a imagem de uma criança ou adolescente.</p></div>
+    <div class="sec-body">
+      <label class="check" style="margin-top:0"><input type="checkbox" id="temMenor"> Sou responsável por um menor de idade e vou autorizar o uso da imagem e da voz dele.</label>
+      <div id="menor-box" class="grid">
+        <div class="s4"><label for="menorNome">Nome completo do menor</label><input type="text" id="menorNome"><div class="err" data-for="menorNome"></div></div>
+        <div class="s2"><label for="menorNasc">Data de nascimento</label><input type="date" id="menorNasc"><div class="err" data-for="menorNasc"></div></div>
+        <div class="s3"><label for="parentesco">Eu sou do menor</label>
+          <select id="parentesco">
+            <option value="">Selecione</option>
+            <option>mãe</option><option>pai</option><option>responsável legal</option>
+          </select><div class="err" data-for="parentesco"></div></div>
+        <div class="s3"><label>A autorização vale para</label>
+          <div class="radios">
+            <label><input type="radio" name="escopo" value="somente o menor" checked> Somente o menor</label>
+            <label><input type="radio" name="escopo" value="o menor e o próprio responsável"> O menor e eu</label>
+          </div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">4</span><h2>O que você autoriza</h2><p>Leia o termo completo antes de aceitar.</p></div>
+    <div class="sec-body">
+      <div class="term" id="termo" tabindex="0" aria-label="Texto do termo"></div>
+      <label class="check"><input type="checkbox" id="aceite"> Li e concordo com o termo.</label>
+      <div class="err" data-for="aceite"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">5</span><h2>Privacidade dos seus dados</h2><p>Como usamos o que você informou, conforme a LGPD.</p></div>
+    <div class="sec-body">
+      <div class="term plain" id="privacidade" tabindex="0" aria-label="Aviso de privacidade"></div>
+      <label class="check"><input type="checkbox" id="aceitePriv"> Li o aviso de privacidade e consinto com o tratamento dos meus dados (e, se for o caso, dos dados do menor) para as finalidades descritas.</label>
+      <div class="err" data-for="aceitePriv"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><span class="num">6</span><h2>Assinatura</h2><p>Desenhe sua assinatura com o dedo, o mouse ou a caneta.</p></div>
+    <div class="sec-body">
+      <div class="sigwrap" id="sigwrap">
+        <span class="ph">Assine aqui</span>
+        <canvas id="sig" aria-label="Campo de assinatura"></canvas>
+      </div>
+      <div class="sig-actions"><span class="hint">A assinatura aparece no PDF.</span><button type="button" id="limpar">Limpar assinatura</button></div>
+      <div class="err" data-for="sig"></div>
+
+      <div style="margin-top:22px">
+        <button type="submit" class="primary" id="gerar">Gerar PDF assinado</button>
+        <div id="status" role="status"></div>
+        <p class="hint foot-note">Seus dados ficam só no seu navegador. Apenas o CEP é enviado ao ViaCEP para preencher o endereço. Guarde o PDF e envie conforme a orientação da instituição.</p>
+      </div>
+    </div>
+  </section>
+
+</form>
+</main>
+
+<div id="ok" role="dialog" aria-live="polite" aria-labelledby="okTitulo">
+  <div class="box">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FBE7EE"/><path d="M19 33l9 9 17-19" fill="none" stroke="#C41E52" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2 id="okTitulo">PDF gerado</h2>
+    <p>O arquivo foi baixado no seu dispositivo. Obrigado!</p>
+    <div>Protocolo<br><span class="prot" id="okProt"></span></div><br>
+    <button type="button" id="novo">Preencher novo termo</button>
+    <p class="hint" id="okAuto" style="margin:14px 0 0"></p>
+  </div>
+</div>
+
+<!-- Documento usado para gerar o PDF -->
+<div id="pdf-root" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  /* ===== CONFIGURAÇÃO — ajuste com o Jurídico/DPO ===== */
+  const CONFIG = {
+    controlador: "AFYA PARTICIPAÇÕES S.A e Empresas COLIGADAS",
+    prazoGuarda: "pelo período de divulgação das campanhas e pelo prazo legal de guarda aplicável",
+    contatoPrivacidade: "[INSERIR E-MAIL DO ENCARREGADO/DPO]",
+    prefixoProtocolo: "AFYA",
+    segundosReinicioQuiosque: 10
+  };
+
+  /* ===== Parâmetros da URL: ?unidade=...&evento=...&quiosque=1 ===== */
+  const params = new URLSearchParams(location.search);
+  const QUIOSQUE = ["1", "true", "sim"].includes((params.get("quiosque") || "").toLowerCase());
+
+  // Logo: tenta o link oficial; se falhar, tenta logo.png local; senão mantém o texto "Afya"
+  const LOGO_SOURCES = [
+    "https://cdn.prod.website-files.com/67164bcd0e2cc62d90a39b3d/68c2c34bd79013fc38eada7a_AFYA%20UNIVERSIDADE%20UNIGRANRIO_MAGENTA%20(1).png",
+    "logo.png"
+  ];
+  window.logoData = null;
+  (async () => {
+    for (const src of LOGO_SOURCES) {
+      try {
+        const img = await new Promise((res, rej) => {
+          const i = new Image(); i.crossOrigin = "anonymous";
+          i.onload = () => res(i); i.onerror = rej; i.src = src;
+        });
+        const c = document.createElement("canvas");
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.getContext("2d").drawImage(img, 0, 0);
+        window.logoData = c.toDataURL("image/png");
+        $("logoBox").innerHTML = `<img src="${window.logoData}" alt="Afya Universidade Unigranrio">`;
+        break;
+      } catch (e) { /* tenta a próxima fonte */ }
+    }
+  })();
+
+  const UFS = "AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ");
+  UFS.forEach(u => $("uf").add(new Option(u, u)));
+
+  const SEDE = "Rua Paraíba, 330, 17º andar, Bairro Funcionários, Belo Horizonte/MG, CEP 30130-917";
+  const paragrafos = [
+    `<b>AUTORIZO</b> o uso de minha imagem e voz e/ou do menor de idade citado abaixo, em todo e qualquer material entre fotos, documentos e outros meios de comunicação, para campanhas promocionais e institucionais da <b>AFYA PARTICIPAÇÕES S.A</b> e <b>Empresas COLIGADAS</b>, com sede na ${SEDE}, e das demais sociedades e/ou instituições de ensino coligadas ou controladas, direta ou indiretamente, pela AFYA, destinadas à divulgação ao público em geral e/ou apenas para uso desta empresa, e desde que não haja desvirtuamento da sua finalidade.`,
+    `A presente autorização é concedida a título gratuito, abrangendo o uso da imagem acima mencionada em todo território nacional e no exterior, sob qualquer forma e meios, ou sejam, em destaque, mas não se limitando aos mesmos: (I) outdoor; (II) bus-door; folhetos em geral (encartes, mala direta, catálogo, etc.); (III) folder de apresentação; (IV) anúncios em revistas e jornais em geral; (V) home page; (VI) cartazes; (VII) back-light; (VIII) mídia eletrônica (painéis, vídeo-tapes, televisão, cinema, programa para rádio, entre outros).`,
+    `Adicionalmente, o Cedente autoriza a <b>AFYA PARTICIPAÇÕES S.A</b> e <b>Empresas COLIGADAS</b>, sem que incida o pagamento de qualquer remuneração, a transmitir, veicular e reproduzir os materiais contendo a sua imagem, nome e/ou voz, a livre critério da Cessionária, sem limitação do número de vezes, em tempo real ou não, por vídeo, via satélite ou qualquer outro serviço de transmissão oferecido no mercado, pela internet, através de sites da Cessionária ou de pessoas por ela autorizadas, ou por quaisquer outros meios de comunicação; explorar, utilizar, divulgar e/ou publicar, total ou parcialmente, por qualquer meio ou suporte, físico ou eletrônico, os materiais contendo sua imagem, nome e/ou voz, para fins de promoção das atividades da Cessionária.`,
+    `Este Termo é celebrado em caráter irrevogável e irretratável, e obriga as Partes e seus herdeiros e sucessores a qualquer título.`,
+    `Por esta ser a expressão da minha vontade declaro que autorizo o uso acima descrito sem que nada haja a ser reclamado a título de direitos conexos à minha imagem/voz ou a qualquer outro, pelo integral período de divulgação das campanhas promocionais e institucionais acima mencionados, e assino a presente autorização.`,
+    `Por ser expressão de verdade, firmo o presente.`
+  ];
+  $("termo").innerHTML = paragrafos.map(p => `<p>${p}</p>`).join("");
+
+  const privItens = [
+    `<b>Dados tratados:</b> nome, RG, CPF, endereço e assinatura de quem autoriza e, quando aplicável, nome e data de nascimento do menor, além da unidade e do evento informados.`,
+    `<b>Finalidade:</b> formalizar a autorização de uso de imagem e voz para as campanhas promocionais e institucionais descritas no termo.`,
+    `<b>Base legal:</b> consentimento do titular ou, no caso de criança ou adolescente, consentimento específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal (LGPD, arts. 7º, I e 14, §1º).`,
+    `<b>Controlador:</b> ${CONFIG.controlador}.`,
+    `<b>Compartilhamento:</b> com as empresas coligadas e instituições de ensino do grupo Afya, quando necessário para a finalidade acima.`,
+    `<b>Armazenamento:</b> ${CONFIG.prazoGuarda}.`,
+    `<b>Seus direitos:</b> você pode solicitar confirmação do tratamento, acesso, correção e outros direitos previstos no art. 18 da LGPD, inclusive a revogação do consentimento, nos termos da lei, pelo contato: ${CONFIG.contatoPrivacidade}.`,
+    `<b>Esta página:</b> processa os dados no seu navegador e gera um PDF para download. Somente o CEP é enviado ao serviço ViaCEP para preencher o endereço.`
+  ];
+  $("privacidade").innerHTML = "<ul>" + privItens.map(i => `<li>${i}</li>`).join("") + "</ul>";
+
+  // Pré-preenchimento por URL (ideal para QR Code por evento)
+  function aplicarParametros() {
+    $("uf").value = "RJ";
+    const un = (params.get("unidade") || "").toLowerCase();
+    if (un) {
+      const op = [...$("unidade").options].find(o => o.value.toLowerCase() === un);
+      if (op) $("unidade").value = op.value;
+    }
+    if (params.get("evento")) $("evento").value = params.get("evento").slice(0, 120);
+  }
+  aplicarParametros();
+
+  // Máscaras
+  $("cpf").addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 11);
+    v = v.replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d)/, "$1.$2").replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    e.target.value = v;
+  });
+  function cpfValido(c) {
+    c = c.replace(/\D/g, "");
+    if (c.length !== 11 || /^(\d)\1+$/.test(c)) return false;
+    for (let t = 9; t < 11; t++) {
+      let s = 0;
+      for (let i = 0; i < t; i++) s += +c[i] * (t + 1 - i);
+      if (((s * 10) % 11) % 10 !== +c[t]) return false;
+    }
+    return true;
+  }
+
+  // CEP + ViaCEP
+  $("cep").addEventListener("input", e => {
+    let v = e.target.value.replace(/\D/g, "").slice(0, 8);
+    e.target.value = v.length > 5 ? v.slice(0, 5) + "-" + v.slice(5) : v;
+    if (v.length === 8) buscarCep(v);
+  });
+  async function buscarCep(cep) {
+    const msg = $("cepMsg");
+    msg.textContent = "Buscando endereço…";
+    try {
+      const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const d = await r.json();
+      if (d.erro) { msg.textContent = "CEP não encontrado. Preencha o endereço manualmente."; return; }
+      const rua = [d.logradouro, d.bairro].filter(Boolean).join(", ");
+      if (rua) $("endereco").value = rua;
+      if (d.localidade) $("cidade").value = d.localidade;
+      if (d.uf) $("uf").value = d.uf;
+      msg.textContent = "Endereço preenchido. Informe o número e confira os dados.";
+      $("numero").focus();
+      progresso();
+    } catch (err) {
+      msg.textContent = "Não foi possível consultar o CEP. Preencha o endereço manualmente.";
+    }
+  }
+
+  $("temMenor").addEventListener("change", e => { $("menor-box").style.display = e.target.checked ? "grid" : "none"; });
+
+  // Assinatura em canvas
+  const cv = $("sig"), ctx = cv.getContext("2d");
+  let desenhando = false, assinou = false;
+  function ajustar() {
+    const r = cv.getBoundingClientRect(), d = window.devicePixelRatio || 1;
+    const img = assinou ? cv.toDataURL() : null;
+    cv.width = r.width * d; cv.height = r.height * d;
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+    ctx.lineWidth = 2.4; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#1a1020";
+    if (img) { const i = new Image(); i.onload = () => ctx.drawImage(i, 0, 0, r.width, r.height); i.src = img; }
+  }
+  window.addEventListener("resize", ajustar); ajustar();
+  const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  function marcarAssinatura() { $("sigwrap").classList.toggle("has-sig", assinou); progresso(); }
+  cv.addEventListener("pointerdown", e => { desenhando = true; cv.setPointerCapture(e.pointerId); const [x, y] = pos(e); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + .1, y + .1); ctx.stroke(); assinou = true; $("sigwrap").classList.add("has-sig"); });
+  cv.addEventListener("pointermove", e => { if (!desenhando) return; const [x, y] = pos(e); ctx.lineTo(x, y); ctx.stroke(); });
+  ["pointerup", "pointercancel"].forEach(ev => cv.addEventListener(ev, () => { desenhando = false; marcarAssinatura(); }));
+  function limparAssinatura() { ctx.clearRect(0, 0, cv.width, cv.height); assinou = false; marcarAssinatura(); }
+  $("limpar").addEventListener("click", limparAssinatura);
+
+  // Progresso
+  function progresso() {
+    const c = [
+      !!$("unidade").value, !!$("nome").value.trim(), !!$("rg").value.trim(), cpfValido($("cpf").value),
+      $("cep").value.replace(/\D/g, "").length === 8, !!$("endereco").value.trim(), !!$("numero").value.trim(),
+      !!$("cidade").value.trim(), !!$("uf").value, $("aceite").checked, $("aceitePriv").checked, assinou
+    ];
+    if ($("temMenor").checked) c.push(!!$("menorNome").value.trim(), !!$("menorNasc").value, !!$("parentesco").value);
+    const pct = Math.round(c.filter(Boolean).length / c.length * 100);
+    $("barFill").style.width = pct + "%";
+    $("progTxt").textContent = pct === 100 ? "Tudo pronto para gerar o PDF" : pct + "% preenchido";
+    $("progTxt").classList.toggle("done", pct === 100);
+  }
+  $("form").addEventListener("input", progresso);
+  $("form").addEventListener("change", progresso);
+
+  // Validação
+  function setErr(k, m) {
+    const el = document.querySelector(`.err[data-for="${k}"]`);
+    el.textContent = m || "";
+    const campo = k === "sig" ? $("sigwrap") : $(k);
+    if (campo) campo.classList.toggle("invalid", !!m);
+    return !m;
+  }
+  function validar() {
+    let ok = true;
+    ["unidade", "nome", "rg", "endereco", "numero", "cidade", "uf"].forEach(k => { ok = setErr(k, $(k).value.trim() ? "" : "Preencha este campo.") && ok; });
+    ok = setErr("cpf", cpfValido($("cpf").value) ? "" : "Confira o CPF: ele parece inválido.") && ok;
+    ok = setErr("cep", $("cep").value.replace(/\D/g, "").length === 8 ? "" : "Informe um CEP com 8 números.") && ok;
+    if ($("temMenor").checked) {
+      ok = setErr("menorNome", $("menorNome").value.trim() ? "" : "Preencha este campo.") && ok;
+      ok = setErr("menorNasc", $("menorNasc").value ? "" : "Informe a data de nascimento.") && ok;
+      ok = setErr("parentesco", $("parentesco").value ? "" : "Selecione uma opção.") && ok;
+    } else { ["menorNome", "menorNasc", "parentesco"].forEach(k => setErr(k)); }
+    ok = setErr("aceite", $("aceite").checked ? "" : "Marque a caixa para concordar com o termo.") && ok;
+    ok = setErr("aceitePriv", $("aceitePriv").checked ? "" : "Marque a caixa para consentir com o aviso de privacidade.") && ok;
+    ok = setErr("sig", assinou ? "" : "Assine no campo acima.") && ok;
+    return ok;
+  }
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const meses = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+
+  // Protocolo e hash (SHA-256)
+  function gerarProtocolo(d) {
+    const rnd = crypto.getRandomValues(new Uint8Array(3));
+    const hex = [...rnd].map(b => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+    const ymd = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0");
+    return `${CONFIG.prefixoProtocolo}-${ymd}-${hex}`;
+  }
+  async function sha256(txt) {
+    if (!(window.crypto && crypto.subtle)) return "indisponível (requer HTTPS)";
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function montarDoc() {
+    const hoje = new Date();
+    const v = k => esc($(k).value.trim());
+    const logo = window.logoData ? `<img src="${window.logoData}" alt="Afya">` : `<div class="wordmark">Afya</div>`;
+    const protocolo = gerarProtocolo(hoje);
+    const temMenor = $("temMenor").checked;
+    const escopo = document.querySelector('input[name="escopo"]:checked').value;
+    const assinatura = cv.toDataURL("image/png");
+    const [a, m, d] = temMenor ? $("menorNasc").value.split("-") : ["", "", ""];
+
+    const dados = {
+      protocolo, emitidoEm: hoje.toISOString(),
+      unidade: $("unidade").value, evento: $("evento").value.trim(),
+      nome: $("nome").value.trim(), rg: $("rg").value.trim(), cpf: $("cpf").value,
+      cep: $("cep").value, endereco: $("endereco").value.trim(), numero: $("numero").value.trim(),
+      cidade: $("cidade").value.trim(), uf: $("uf").value,
+      menor: temMenor ? { nome: $("menorNome").value.trim(), nascimento: $("menorNasc").value, parentesco: $("parentesco").value, escopo } : null,
+      aceiteTermo: true, aceitePrivacidade: true,
+      textoTermo: paragrafos.join("\n"), assinatura
+    };
+    const hash = await sha256(JSON.stringify(dados));
+
+    const blocoMenor = temMenor
+      ? `<p><b>Nome completo do menor de idade:</b> ${v("menorNome")} &nbsp;&nbsp; <b>Data de nascimento:</b> ${d}/${m}/${a}</p>
+         <p>Assino na qualidade de <b>${esc($("parentesco").value)}</b> do menor acima identificado, autorizando o uso da imagem e voz de <b>${esc(escopo)}</b>.</p>`
+      : `<p><b>Nome completo do menor de idade:</b> não se aplica.</p>`;
+
+    $("pdf-root").innerHTML = `
+      <div class="logo">${logo}</div>
+      <h2>TERMO DE AUTORIZAÇÃO DE USO DE IMAGEM E VOZ</h2>
+      <p>Eu, <b>${v("nome")}</b>, portador da Cédula de Identidade nº <b>${v("rg")}</b>, inscrito no CPF sob nº <b>${v("cpf")}</b>, residente no endereço <b>${v("endereco")}</b>, nº <b>${v("numero")}</b>, CEP <b>${v("cep")}</b>, cidade <b>${v("cidade")}</b>, UF <b>${v("uf")}</b>,</p>
+      ${paragrafos.map(p => `<p>${p}</p>`).join("")}
+      ${blocoMenor}
+      <p>Declaro ter lido o Aviso de Privacidade e consinto com o tratamento dos dados para as finalidades nele descritas.</p>
+      <p>${v("cidade")}, ${hoje.getDate()} de ${meses[hoje.getMonth()]} de ${hoje.getFullYear()}.</p>
+      <div class="sig"><img src="${assinatura}" alt="Assinatura"><div class="line">Assinatura: ${v("nome")}</div></div>
+      <div class="meta">
+        <b>Protocolo:</b> ${protocolo}<br>
+        <b>Unidade:</b> ${v("unidade")}${$("evento").value.trim() ? " &nbsp;|&nbsp; <b>Evento/campanha:</b> " + v("evento") : ""}<br>
+        <b>Assinado eletronicamente em:</b> ${hoje.toLocaleString("pt-BR")}<br>
+        <b>Código de verificação (SHA-256 dos dados e da assinatura):</b><br>
+        <span class="hash">${hash}</span>
+      </div>`;
+    return { protocolo, hash, nome: dados.nome };
+  }
+
+  async function gerarPdf(info) {
+    const canvas = await html2canvas($("pdf-root"), { scale: 2, backgroundColor: "#fff", useCORS: true });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+    pdf.setProperties({ title: `Termo de Autorização de Imagem e Voz - ${info.protocolo}`, subject: `Protocolo ${info.protocolo}`, keywords: info.hash });
+    const W = 210, H = 297;
+    const pageHpx = Math.floor(canvas.width * H / W);
+    let y = 0, first = true;
+    while (y < canvas.height) {
+      const sl = document.createElement("canvas");
+      sl.width = canvas.width; sl.height = Math.min(pageHpx, canvas.height - y);
+      sl.getContext("2d").drawImage(canvas, 0, y, canvas.width, sl.height, 0, 0, canvas.width, sl.height);
+      if (!first) pdf.addPage();
+      pdf.addImage(sl.toDataURL("image/jpeg", .95), "JPEG", 0, 0, W, sl.height * W / canvas.width);
+      y += pageHpx; first = false;
+    }
+    const nomeArq = info.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_");
+    pdf.save(`termo_imagem_voz_${nomeArq}_${info.protocolo}.pdf`);
+  }
+
+  // Reinício do formulário (modo quiosque e botão "Preencher novo termo")
+  let timer = null;
+  function reiniciar() {
+    clearInterval(timer);
+    $("form").reset();
+    $("menor-box").style.display = "none";
+    ctx.clearRect(0, 0, cv.width, cv.height); assinou = false;
+    $("sigwrap").classList.remove("has-sig");
+    document.querySelectorAll(".err").forEach(e => e.textContent = "");
+    document.querySelectorAll(".invalid").forEach(e => e.classList.remove("invalid"));
+    $("cepMsg").textContent = ""; $("status").textContent = "";
+    aplicarParametros();
+    progresso();
+    $("ok").classList.remove("show");
+    window.scrollTo({ top: 0 });
+  }
+  $("novo").addEventListener("click", reiniciar);
+
+  function mostrarSucesso(protocolo) {
+    $("okProt").textContent = protocolo;
+    $("ok").classList.add("show");
+    if (QUIOSQUE) {
+      let s = CONFIG.segundosReinicioQuiosque;
+      $("okAuto").textContent = `Novo formulário em ${s}s.`;
+      timer = setInterval(() => {
+        s--; $("okAuto").textContent = `Novo formulário em ${s}s.`;
+        if (s <= 0) reiniciar();
+      }, 1000);
+    } else { $("okAuto").textContent = ""; }
+  }
+
+  $("form").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!validar()) {
+      $("status").textContent = "Faltam alguns campos. Veja os avisos em vermelho.";
+      document.querySelector(".err:not(:empty)")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    const btn = $("gerar"), st = $("status");
+    btn.disabled = true; st.style.color = "var(--muted)"; st.textContent = "Gerando o PDF…";
+    try {
+      const info = await montarDoc();
+      await gerarPdf(info);
+      st.textContent = "";
+      mostrarSucesso(info.protocolo);
+    } catch (err) {
+      console.error(err);
+      st.style.color = "var(--danger)";
+      st.textContent = "Não foi possível gerar o PDF: " + (err && err.message ? err.message : err);
+    } finally { btn.disabled = false; }
+  });
+
+  $("status").style.color = "var(--danger)";
+  progresso();
+})();
+</script>
+</body>
+</html>
