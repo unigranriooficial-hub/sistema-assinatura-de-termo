@@ -94,15 +94,20 @@
   .foot-note { margin-top:6px; }
 
   /* Tela de sucesso */
-  #ok { display:none; position:fixed; inset:0; background:rgba(244,239,245,.98); z-index:50; align-items:center; justify-content:center; text-align:center; padding:24px; }
+  #ok { display:none; position:fixed; inset:0; background:rgba(244,239,245,.98); z-index:50; align-items:center; justify-content:center; text-align:center; padding:24px; overflow:auto; }
   #ok.show { display:flex; }
-  #ok .box { max-width:440px; background:#fff; border-radius:20px; padding:36px 28px; box-shadow:0 10px 40px rgba(60,20,70,.12); animation:pop .3s ease; }
+  #ok .box { max-width:440px; width:100%; background:#fff; border-radius:20px; padding:36px 28px; box-shadow:0 10px 40px rgba(60,20,70,.12); animation:pop .3s ease; }
   @keyframes pop { from { transform:scale(.96); opacity:0; } to { transform:none; opacity:1; } }
   #ok svg { width:64px; height:64px; margin-bottom:8px; }
   #ok h2 { font-family:var(--display); font-weight:800; font-size:28px; margin:0 0 8px; }
   #ok p { margin:0 0 14px; color:var(--muted); }
   #ok .prot { font-family:ui-monospace, Menlo, Consolas, monospace; font-size:15px; background:var(--brand-soft); color:var(--brand-dark); padding:8px 12px; border-radius:8px; display:inline-block; margin:6px 0 20px; }
-  #ok button { background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; min-height:50px; padding:0 26px; }
+  #ok button { display:block; width:100%; background:var(--brand); border-color:var(--brand); color:#fff; font-weight:600; min-height:50px; padding:0 26px; }
+  #ok button:hover { background:var(--brand-dark); border-color:var(--brand-dark); }
+  #ok button.alt { background:#fff; color:var(--brand); border-color:var(--brand); }
+  #ok button.alt:hover { background:var(--brand-soft); }
+  #ok button + button { margin-top:10px; }
+  #ok .wpp-hint { margin:10px 0 18px; font-size:13.5px; }
 
   @media (prefers-reduced-motion:reduce){ *, *::before, *::after { animation:none!important; transition:none!important; } }
 
@@ -132,7 +137,7 @@
 
 <div class="hero">
   <h1>Autorização de uso de imagem e voz</h1>
-  <p>Preencha seus dados, assine na tela e baixe o PDF. Leva cerca de dois minutos.</p>
+  <p>Preencha seus dados, assine na tela, baixe o PDF e envie pelo WhatsApp. Leva cerca de dois minutos.</p>
 </div>
 
 <main>
@@ -158,12 +163,11 @@
     <div class="sec-head"><span class="num">2</span><h2>Seus dados</h2><p>Preencha como aparecem no seu documento.</p></div>
     <div class="sec-body"><div class="grid">
       <div><label for="nome">Nome completo</label><input type="text" id="nome" autocomplete="name"><div class="err" data-for="nome"></div></div>
-      <!--<div class="s3"><label for="rg">Identidade (RG)</label><input type="text" id="rg"><div class="err" data-for="rg"></div></div>-->
       <div class="s3"><label for="cpf">CPF</label><input type="text" id="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00"><div class="err" data-for="cpf"></div></div>
-      <div class="s2"><label for="cep">CEP</label><input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"><div class="err" data-for="cep"></div></div>
+      <div class="s3"><label for="cep">CEP</label><input type="text" id="cep" inputmode="numeric" maxlength="9" placeholder="00000-000" autocomplete="postal-code"><div class="err" data-for="cep"></div></div>
       <div class="s4"><label for="endereco">Endereço</label><input type="text" id="endereco" autocomplete="street-address"><div class="err" data-for="endereco"></div></div>
       <div class="s2"><label for="numero">Número</label><input type="text" id="numero"><div class="err" data-for="numero"></div></div>
-      <div class="s2"><label for="cidade">Cidade</label><input type="text" id="cidade"><div class="err" data-for="cidade"></div></div>
+      <div class="s4"><label for="cidade">Cidade</label><input type="text" id="cidade"><div class="err" data-for="cidade"></div></div>
       <div class="s2"><label for="uf">UF</label><select id="uf"><option value="">Selecione</option></select><div class="err" data-for="uf"></div></div>
     </div>
     <div class="hint" id="cepMsg"></div></div>
@@ -221,7 +225,7 @@
       <div style="margin-top:22px">
         <button type="submit" class="primary" id="gerar">Gerar PDF assinado</button>
         <div id="status" role="status"></div>
-        <p class="hint foot-note">Seus dados ficam só no seu navegador. Apenas o CEP é enviado ao ViaCEP para preencher o endereço. Guarde o PDF e envie conforme a orientação da instituição.</p>
+        <p class="hint foot-note">O PDF é gerado no seu navegador e uma cópia é guardada com segurança pela instituição. Apenas o CEP é enviado ao ViaCEP para preencher o endereço.</p>
       </div>
     </div>
   </section>
@@ -233,9 +237,12 @@
   <div class="box">
     <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#FBE7EE"/><path d="M19 33l9 9 17-19" fill="none" stroke="#C41E52" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <h2 id="okTitulo">PDF gerado</h2>
-    <p>O arquivo foi baixado no seu dispositivo. Obrigado!</p>
-    <div>Protocolo<br><span class="prot" id="okProt"></span></div><br>
-    <button type="button" id="novo">Preencher novo termo</button>
+    <p>O arquivo foi baixado no seu dispositivo. Agora envie uma cópia assinada para a Afya pelo WhatsApp.</p>
+    <div>Protocolo<br><span class="prot" id="okProt"></span></div>
+    <button type="button" id="btnShare">Compartilhar PDF pelo WhatsApp</button>
+    <button type="button" id="btnChat" class="alt">Abrir conversa com a Afya</button>
+    <p class="hint wpp-hint">Se abrir só a conversa, toque no clipe e anexe o PDF que acabou de ser baixado.</p>
+    <button type="button" id="novo" class="alt">Preencher novo termo</button>
     <p class="hint" id="okAuto" style="margin:14px 0 0"></p>
   </div>
 </div>
@@ -243,6 +250,7 @@
 <!-- Documento usado para gerar o PDF -->
 <div id="pdf-root" aria-hidden="true"></div>
 
+<script src="registro.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
@@ -255,7 +263,8 @@
     prazoGuarda: "pelo período de divulgação das campanhas e pelo prazo legal de guarda aplicável",
     contatoPrivacidade: "[INSERIR E-MAIL DO ENCARREGADO/DPO]",
     prefixoProtocolo: "AFYA",
-    segundosReinicioQuiosque: 10
+    whatsapp: "5521971815619",          // número que recebe o termo (DDI + DDD + número, só dígitos)
+    segundosReinicioQuiosque: 60        // tempo da tela de sucesso no modo quiosque
   };
 
   /* ===== Parâmetros da URL: ?unidade=...&evento=...&quiosque=1 ===== */
@@ -300,14 +309,14 @@
   $("termo").innerHTML = paragrafos.map(p => `<p>${p}</p>`).join("");
 
   const privItens = [
-    `<b>Dados tratados:</b> nome, RG, CPF, endereço e assinatura de quem autoriza e, quando aplicável, nome e data de nascimento do menor, além da unidade e do evento informados.`,
+    `<b>Dados tratados:</b> nome, CPF, endereço e assinatura de quem autoriza e, quando aplicável, nome e data de nascimento do menor, além da unidade e do evento informados.`,
     `<b>Finalidade:</b> formalizar a autorização de uso de imagem e voz para as campanhas promocionais e institucionais descritas no termo.`,
     `<b>Base legal:</b> consentimento do titular ou, no caso de criança ou adolescente, consentimento específico e em destaque dado por pelo menos um dos pais ou pelo responsável legal (LGPD, arts. 7º, I e 14, §1º).`,
     `<b>Controlador:</b> ${CONFIG.controlador}.`,
     `<b>Compartilhamento:</b> com as empresas coligadas e instituições de ensino do grupo Afya, quando necessário para a finalidade acima.`,
-    `<b>Armazenamento:</b> ${CONFIG.prazoGuarda}.`,
+    `<b>Armazenamento:</b> uma cópia do termo assinado (PDF) e os dados informados ficam guardados em ambiente seguro da instituição ${CONFIG.prazoGuarda}, com acesso restrito à equipe autorizada.`,
     `<b>Seus direitos:</b> você pode solicitar confirmação do tratamento, acesso, correção e outros direitos previstos no art. 18 da LGPD, inclusive a revogação do consentimento, nos termos da lei, pelo contato: ${CONFIG.contatoPrivacidade}.`,
-    `<b>Esta página:</b> processa os dados no seu navegador e gera um PDF para download. Somente o CEP é enviado ao serviço ViaCEP para preencher o endereço.`
+    `<b>Esta página:</b> gera o PDF no seu navegador e envia uma cópia ao armazenamento da instituição. O CEP também é enviado ao serviço ViaCEP para preencher o endereço.`
   ];
   $("privacidade").innerHTML = "<ul>" + privItens.map(i => `<li>${i}</li>`).join("") + "</ul>";
 
@@ -390,7 +399,7 @@
   // Progresso
   function progresso() {
     const c = [
-      !!$("unidade").value, !!$("nome").value.trim(), !!$("rg").value.trim(), cpfValido($("cpf").value),
+      !!$("unidade").value, !!$("nome").value.trim(), cpfValido($("cpf").value),
       $("cep").value.replace(/\D/g, "").length === 8, !!$("endereco").value.trim(), !!$("numero").value.trim(),
       !!$("cidade").value.trim(), !!$("uf").value, $("aceite").checked, $("aceitePriv").checked, assinou
     ];
@@ -413,7 +422,7 @@
   }
   function validar() {
     let ok = true;
-    ["unidade", "nome", "rg", "endereco", "numero", "cidade", "uf"].forEach(k => { ok = setErr(k, $(k).value.trim() ? "" : "Preencha este campo.") && ok; });
+    ["unidade", "nome", "endereco", "numero", "cidade", "uf"].forEach(k => { ok = setErr(k, $(k).value.trim() ? "" : "Preencha este campo.") && ok; });
     ok = setErr("cpf", cpfValido($("cpf").value) ? "" : "Confira o CPF: ele parece inválido.") && ok;
     ok = setErr("cep", $("cep").value.replace(/\D/g, "").length === 8 ? "" : "Informe um CEP com 8 números.") && ok;
     if ($("temMenor").checked) {
@@ -456,7 +465,7 @@
     const dados = {
       protocolo, emitidoEm: hoje.toISOString(),
       unidade: $("unidade").value, evento: $("evento").value.trim(),
-      nome: $("nome").value.trim(), rg: $("rg").value.trim(), cpf: $("cpf").value,
+      nome: $("nome").value.trim(), cpf: $("cpf").value,
       cep: $("cep").value, endereco: $("endereco").value.trim(), numero: $("numero").value.trim(),
       cidade: $("cidade").value.trim(), uf: $("uf").value,
       menor: temMenor ? { nome: $("menorNome").value.trim(), nascimento: $("menorNasc").value, parentesco: $("parentesco").value, escopo } : null,
@@ -473,7 +482,7 @@
     $("pdf-root").innerHTML = `
       <div class="logo">${logo}</div>
       <h2>TERMO DE AUTORIZAÇÃO DE USO DE IMAGEM E VOZ</h2>
-      <p>Eu, <b>${v("nome")}</b>, portador da Cédula de Identidade nº <b>${v("rg")}</b>, inscrito no CPF sob nº <b>${v("cpf")}</b>, residente no endereço <b>${v("endereco")}</b>, nº <b>${v("numero")}</b>, CEP <b>${v("cep")}</b>, cidade <b>${v("cidade")}</b>, UF <b>${v("uf")}</b>,</p>
+      <p>Eu, <b>${v("nome")}</b>, inscrito no CPF sob nº <b>${v("cpf")}</b>, residente no endereço <b>${v("endereco")}</b>, nº <b>${v("numero")}</b>, CEP <b>${v("cep")}</b>, cidade <b>${v("cidade")}</b>, UF <b>${v("uf")}</b>,</p>
       ${paragrafos.map(p => `<p>${p}</p>`).join("")}
       ${blocoMenor}
       <p>Declaro ter lido o Aviso de Privacidade e consinto com o tratamento dos dados para as finalidades nele descritas.</p>
@@ -506,13 +515,44 @@
       y += pageHpx; first = false;
     }
     const nomeArq = info.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9]+/g, "_");
-    pdf.save(`termo_imagem_voz_${nomeArq}_${info.protocolo}.pdf`);
+    const nomeArquivo = `termo_imagem_voz_${nomeArq}_${info.protocolo}.pdf`;
+    pdf.save(nomeArquivo);
+    return { nomeArquivo, blob: pdf.output("blob") };
   }
+
+  // ===== WhatsApp =====
+  let ultimoPdf = null, ultimoProtocolo = "";
+  const textoWhats = () => `Olá! Segue o termo de autorização de uso de imagem e voz assinado. Protocolo: ${ultimoProtocolo}`;
+
+  function pausarReinicio() {
+    clearInterval(timer);
+    $("okAuto").textContent = "";
+  }
+  function abrirChat() {
+    pausarReinicio();
+    window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(textoWhats())}`, "_blank", "noopener");
+  }
+  $("btnChat").addEventListener("click", abrirChat);
+  $("btnShare").addEventListener("click", async () => {
+    if (!ultimoPdf) return;
+    pausarReinicio();
+    const file = new File([ultimoPdf.blob], ultimoPdf.nomeArquivo, { type: "application/pdf" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: "Termo de imagem e voz", text: textoWhats() });
+      } catch (e) {
+        if (e && e.name !== "AbortError") abrirChat(); // se falhar, abre a conversa; se a pessoa cancelou, não faz nada
+      }
+    } else {
+      abrirChat(); // computador ou navegador sem compartilhamento de arquivo
+    }
+  });
 
   // Reinício do formulário (modo quiosque e botão "Preencher novo termo")
   let timer = null;
   function reiniciar() {
     clearInterval(timer);
+    ultimoPdf = null; ultimoProtocolo = "";
     $("form").reset();
     $("menor-box").style.display = "none";
     ctx.clearRect(0, 0, cv.width, cv.height); assinou = false;
@@ -530,6 +570,7 @@
   function mostrarSucesso(protocolo) {
     $("okProt").textContent = protocolo;
     $("ok").classList.add("show");
+    clearInterval(timer);
     if (QUIOSQUE) {
       let s = CONFIG.segundosReinicioQuiosque;
       $("okAuto").textContent = `Novo formulário em ${s}s.`;
@@ -551,7 +592,20 @@
     btn.disabled = true; st.style.color = "var(--muted)"; st.textContent = "Gerando o PDF…";
     try {
       const info = await montarDoc();
-      await gerarPdf(info);
+      ultimoPdf = await gerarPdf(info);
+      ultimoProtocolo = info.protocolo;
+
+      // Guarda uma cópia no servidor da instituição (painel da equipe)
+      const b64 = await new Promise(r => { const f = new FileReader(); f.onload = () => r(f.result.split(",")[1]); f.readAsDataURL(ultimoPdf.blob); });
+      try {
+        await Registro.salvar({
+          protocolo: info.protocolo, emitidoEm: new Date().toISOString(),
+          unidade: $("unidade").value, evento: $("evento").value.trim(),
+          nome: info.nome, cpf: $("cpf").value.replace(/\D/g, ""),
+          hash: info.hash, arquivo: ultimoPdf.nomeArquivo, pdfBase64: b64
+        });
+      } catch (e) { console.warn("Termo não salvo no servidor", e); }
+
       st.textContent = "";
       mostrarSucesso(info.protocolo);
     } catch (err) {
