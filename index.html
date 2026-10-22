@@ -239,9 +239,8 @@
     <h2 id="okTitulo">PDF gerado</h2>
     <p>O arquivo foi baixado no seu dispositivo. Agora envie uma cópia assinada para a Afya pelo WhatsApp.</p>
     <div>Protocolo<br><span class="prot" id="okProt"></span></div>
-    <button type="button" id="btnShare">Compartilhar PDF pelo WhatsApp</button>
-    <button type="button" id="btnChat" class="alt">Abrir conversa com a Afya</button>
-    <p class="hint wpp-hint">Se abrir só a conversa, toque no clipe e anexe o PDF que acabou de ser baixado.</p>
+    <button type="button" id="btnChat">Abrir conversa com a Afya</button>
+    <p class="hint wpp-hint">No celular, o PDF vai anexado: escolha o WhatsApp e depois a conversa com a Afya. Se abrir só a conversa, toque no clipe e anexe o PDF que acabou de ser baixado.</p>
     <button type="button" id="novo" class="alt">Preencher novo termo</button>
     <p class="hint" id="okAuto" style="margin:14px 0 0"></p>
   </div>
@@ -522,18 +521,20 @@
 
   // ===== WhatsApp =====
   let ultimoPdf = null, ultimoProtocolo = "";
+  let timer = null;
   const textoWhats = () => `Olá! Segue o termo de autorização de uso de imagem e voz assinado. Protocolo: ${ultimoProtocolo}`;
 
   function pausarReinicio() {
     clearInterval(timer);
     $("okAuto").textContent = "";
   }
+  // Plano B: abre a conversa com a Afya só com o texto (o PDF já foi baixado; basta anexar)
   function abrirChat() {
     pausarReinicio();
     window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(textoWhats())}`, "_blank", "noopener");
   }
-  $("btnChat").addEventListener("click", abrirChat);
-  $("btnShare").addEventListener("click", async () => {
+  // Plano A: abre o compartilhamento do aparelho já com o PDF anexado
+  async function enviarPdfWhatsApp() {
     if (!ultimoPdf) return;
     pausarReinicio();
     const file = new File([ultimoPdf.blob], ultimoPdf.nomeArquivo, { type: "application/pdf" });
@@ -546,10 +547,10 @@
     } else {
       abrirChat(); // computador ou navegador sem compartilhamento de arquivo
     }
-  });
+  }
+  $("btnChat").addEventListener("click", enviarPdfWhatsApp);
 
   // Reinício do formulário (modo quiosque e botão "Preencher novo termo")
-  let timer = null;
   function reiniciar() {
     clearInterval(timer);
     ultimoPdf = null; ultimoProtocolo = "";
